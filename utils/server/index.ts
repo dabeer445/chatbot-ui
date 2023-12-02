@@ -1,5 +1,5 @@
 import { Message } from '@/types/chat';
-import { OpenAIModel } from '@/types/openai';
+import { OpenAIModel, Thread, Messages } from '@/types/openai';
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
 import OpenAI from "openai";
 
@@ -178,7 +178,7 @@ export const AssistantStream = async (
     });
 
   }
-  const createRun = (threadID: string, assistantId: string) => {
+  const createRun = (threadID: string, assistantId: string): Promise<Thread> => {
     return new Promise(async (resolve, reject) => {
 
       let url = `${OPENAI_API_HOST}/v1/threads/${threadID}/runs`;
@@ -215,7 +215,7 @@ export const AssistantStream = async (
 
   }
 
-  const retrieveMsg = (threadID: string) => {
+  const retrieveMsg = (threadID: string): Promise<any> => {
     return new Promise(async (resolve, reject) => {
 
       let url = `${OPENAI_API_HOST}/v1/threads/${threadID}/messages `;
@@ -228,7 +228,7 @@ export const AssistantStream = async (
     });
 
   }
-  let myRun, threadId;
+  let myRun: Thread, threadId;
 
   // await mongo_client.connect();
   // const db = mongo_client.db();
@@ -265,11 +265,11 @@ export const AssistantStream = async (
 
   let msg = await createMessage(threadID, message)
   myRun = await createRun(threadID, OPENAI_ASSISTANT_ID)
-  let run = await retrieveRun(threadID, myRun?.id)
+  let run = await retrieveRun(threadID, myRun.id)
 
   const allMessages = await retrieveMsg(threadID);
 
-  return allMessages?.data[0].content[0].text.value;
+  return allMessages.data[0].content[0].text.value;
   // const retrieveRun = async () => {
   //   let keepRetrievingRun;
 

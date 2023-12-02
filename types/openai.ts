@@ -43,3 +43,27 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
     tokenLimit: 32000,
   },
 };
+
+export interface Thread {
+  id: string,
+}
+export interface Message {
+  id: string,
+  object: string,
+  created_at: number,
+  thread_id: string,
+  role: string,
+  content: [],
+  file_ids: [],
+  assistant_id: string | null ,
+  run_id: string | null ,
+  metadata: {}
+
+}
+export interface Messages {
+  object: string,
+  data: Message[],
+  first_id: string,
+  last_id: string,
+  has_more: boolean
+}
