@@ -22,6 +22,7 @@ import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import { useUser } from "@clerk/nextjs";
 
 export interface Props {
   message: Message;
@@ -31,6 +32,7 @@ export interface Props {
 
 export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) => {
   const { t } = useTranslation('chat');
+  const { user } = useUser();
 
   const {
     state: { selectedConversation, conversations, currentMessage, messageIsStreaming },
@@ -89,6 +91,7 @@ export const ChatMessage: FC<Props> = memo(({ message, messageIndex, onEdit }) =
     const { single, all } = updateConversation(
       updatedConversation,
       conversations,
+      user?.id
     );
     homeDispatch({ field: 'selectedConversation', value: single });
     homeDispatch({ field: 'conversations', value: all });

@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import Image from 'next/image';
-
+import { useUser } from "@clerk/nextjs";
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
@@ -62,6 +62,7 @@ const Home = ({
   const contextValue = useCreateReducer<HomeInitialState>({
     initialState,
   });
+  const { isLoaded, isSignedIn, user } = useUser();
 
   const {
     state: {
@@ -109,7 +110,7 @@ const Home = ({
       value: conversation,
     });
 
-    saveConversation(conversation);
+    saveConversation(conversation, user?.id);
   };
 
   // FOLDER OPERATIONS  --------------------------------------------
@@ -144,7 +145,7 @@ const Home = ({
     });
 
     dispatch({ field: 'conversations', value: updatedConversations });
-    saveConversations(updatedConversations);
+    saveConversations(updatedConversations, user?.id);
 
     const updatedPrompts: Prompt[] = prompts.map((p) => {
       if (p.folderId === folderId) {
@@ -174,7 +175,7 @@ const Home = ({
     });
 
     dispatch({ field: 'folders', value: updatedFolders });
-
+  
     saveFolders(updatedFolders);
   };
 
@@ -187,14 +188,14 @@ const Home = ({
       id: uuidv4(),
       name: t('New Conversation'),
       messages: [],
-      model: lastConversation?.model || {
-        id: OpenAIModels[defaultModelId].id,
-        name: OpenAIModels[defaultModelId].name,
-        maxLength: OpenAIModels[defaultModelId].maxLength,
-        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
-      },
-      prompt: DEFAULT_SYSTEM_PROMPT,
-      temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+      // model: lastConversation?.model || {
+      //   id: OpenAIModels[defaultModelId].id,
+      //   name: OpenAIModels[defaultModelId].name,
+      //   maxLength: OpenAIModels[defaultModelId].maxLength,
+      //   tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
+      // },
+      // prompt: DEFAULT_SYSTEM_PROMPT,
+      // temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,
     };
 
@@ -203,8 +204,8 @@ const Home = ({
     dispatch({ field: 'selectedConversation', value: newConversation });
     dispatch({ field: 'conversations', value: updatedConversations });
 
-    saveConversation(newConversation);
-    saveConversations(updatedConversations);
+    saveConversation(newConversation, user?.id);
+    saveConversations(updatedConversations, user?.id);
 
     dispatch({ field: 'loading', value: false });
   };
@@ -221,8 +222,8 @@ const Home = ({
     const { single, all } = updateConversation(
       updatedConversation,
       conversations,
+      user?.id
     );
-
     dispatch({ field: 'selectedConversation', value: single });
     dispatch({ field: 'conversations', value: all });
   };
@@ -328,16 +329,16 @@ const Home = ({
         value: cleanedSelectedConversation,
       });
     } else {
-      const lastConversation = conversations[conversations.length - 1];
+      // const lastConversation = conversations[conversations.length - 1];
       dispatch({
         field: 'selectedConversation',
         value: {
           id: uuidv4(),
           name: t('New Conversation'),
           messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+          // model: OpenAIModels[defaultModelId],
+          // prompt: DEFAULT_SYSTEM_PROMPT,
+          // temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
           folderId: null,
         },
       });
@@ -348,7 +349,6 @@ const Home = ({
     serverSideApiKeyIsSet,
     serverSidePluginKeysSet,
   ]);
-
   return (
     <HomeContext.Provider
       value={{
@@ -371,6 +371,7 @@ const Home = ({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (
+        
         <main
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
         >
@@ -387,6 +388,8 @@ const Home = ({
               <Image src={hp.src} alt="logo"  width={45} height={45} className="w-[--hp-logo-height]" />
             </div>
             <div className="text-lg flex flex-1 justify-center text-lg" >{selectedConversation.name}</div>
+            {user?.id}
+            {/* <div className="text-lg flex flex-1 justify-center text-lg" >{selectedConversation.name}</div> */}
           </div>
 
           <div className="flex h-main w-full pt-[48px] sm:pt-0" >

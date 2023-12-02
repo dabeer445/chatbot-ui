@@ -24,10 +24,14 @@ import Sidebar from '../Sidebar';
 import ChatbarContext from './Chatbar.context';
 import { ChatbarInitialState, initialState } from './Chatbar.state';
 
+import { useUser } from "@clerk/nextjs";
+
 import { v4 as uuidv4 } from 'uuid';
 
 export const Chatbar = () => {
   const { t } = useTranslation('sidebar');
+
+  const { user } = useUser();
 
   const chatBarContextValue = useCreateReducer<ChatbarInitialState>({
     initialState,
@@ -144,7 +148,7 @@ export const Chatbar = () => {
 
     homeDispatch({ field: 'conversations', value: updatedConversations });
     chatDispatch({ field: 'searchTerm', value: '' });
-    saveConversations(updatedConversations);
+    saveConversations(updatedConversations, user?.id);
 
     if (updatedConversations.length > 0) {
       homeDispatch({
@@ -152,7 +156,7 @@ export const Chatbar = () => {
         value: updatedConversations[updatedConversations.length - 1],
       });
 
-      saveConversation(updatedConversations[updatedConversations.length - 1]);
+      saveConversation(updatedConversations[updatedConversations.length - 1], user?.id);
     } else {
       defaultModelId &&
         homeDispatch({

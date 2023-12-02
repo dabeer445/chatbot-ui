@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 import toast from 'react-hot-toast';
+import { useUser } from "@clerk/nextjs";
 
 
 import { useTranslation } from 'next-i18next';
@@ -69,10 +70,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const { user } = useUser();
+
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
       if (selectedConversation) {
-        console.log(selectedConversation);
         let updatedConversation: Conversation;
         if (deleteCount) {
           const updatedMessages = [...selectedConversation.messages];
@@ -97,11 +99,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         homeDispatch({ field: 'messageIsStreaming', value: true });
         const chatBody: ChatBody = {
           convID: selectedConversation.id,
-          model: updatedConversation.model,
           messages: updatedConversation.messages,
           key: apiKey,
-          prompt: updatedConversation.prompt,
-          temperature: updatedConversation.temperature,
+          // model: updatedConversation.model,
+          // prompt: updatedConversation.prompt,
+          // temperature: updatedConversation.temperature,
         };
         const endpoint = getEndpoint(plugin);
         let body;
@@ -200,7 +202,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               });
             }
           }
-          saveConversation(updatedConversation);
+          saveConversation(updatedConversation, user?.id);
           const updatedConversations: Conversation[] = conversations.map(
             (conversation) => {
               if (conversation.id === selectedConversation.id) {
@@ -213,8 +215,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             updatedConversations.push(updatedConversation);
           }
           homeDispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(updatedConversations);
-          console.log(222)
+          saveConversations(updatedConversations, user?.id);
           homeDispatch({ field: 'messageIsStreaming', value: false });
         } else {
           const { answer } = await response.json();
@@ -230,7 +231,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             field: 'selectedConversation',
             value: updateConversation,
           });
-          saveConversation(updatedConversation);
+          saveConversation(updatedConversation, user?.id);
           const updatedConversations: Conversation[] = conversations.map(
             (conversation) => {
               if (conversation.id === selectedConversation.id) {
@@ -243,7 +244,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             updatedConversations.push(updatedConversation);
           }
           homeDispatch({ field: 'conversations', value: updatedConversations });
-          saveConversations(updatedConversations);
+          saveConversations(updatedConversations, user?.id);
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
         }
@@ -312,7 +313,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const throttledScrollDown = throttle(scrollDown, 250);
 
   // useEffect(() => {
-  //   console.log('currentMessage', currentMessage);
   //   if (currentMessage) {
   //     handleSend(currentMessage);
   //     homeDispatch({ field: 'currentMessage', value: undefined });

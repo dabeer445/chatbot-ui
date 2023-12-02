@@ -29,10 +29,7 @@ export default function SignIn() {
       })
       .then((result) => {
         if (result.status === 'complete') {
-          console.log(result);
           setActive({ session: result.createdSessionId });
-
-          console.log('LOGGED IN', sessionId);
           //   router.push('/');
         } else {
           console.log(result);
