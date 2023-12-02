@@ -5,6 +5,7 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+import Image from 'next/image';
 
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
@@ -383,7 +384,7 @@ const Home = ({
           {/* <div className="flex"> */}
           <div className="flex items-center p-2" >
             <div className="w-[260px] pl-8">
-              <img src={hp.src} className="w-[--hp-logo-height]" />
+              <Image src={hp.src} alt="logo" className="w-[--hp-logo-height]" />
             </div>
             <div className="text-lg flex flex-1 justify-center text-lg" >{selectedConversation.name}</div>
           </div>

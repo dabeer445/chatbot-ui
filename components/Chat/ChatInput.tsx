@@ -21,7 +21,7 @@ import { useTranslation } from 'next-i18next';
 import { Message } from '@/types/chat';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
-
+import Image from 'next/image'
 import HomeContext from '@/pages/api/home/home.context';
 
 import { PluginSelect } from './PluginSelect';
@@ -382,7 +382,8 @@ export const ChatInput = ({
         </div>
       </div>
       <div className="px-3 pt-2 pb-3 flex justify-center  text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
-        <img src={cogent.src} />
+        <Image src={cogent.src} alt="logo" />
+
       </div>
     </div>
   );

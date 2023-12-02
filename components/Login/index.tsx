@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import logo from '@/public/logo.png';
@@ -31,8 +32,8 @@ export default function SignIn() {
           console.log(result);
           setActive({ session: result.createdSessionId });
 
-          console.log('LOGGED IN',sessionId);
-        //   router.push('/');
+          console.log('LOGGED IN', sessionId);
+          //   router.push('/');
         } else {
           console.log(result);
         }
@@ -43,7 +44,7 @@ export default function SignIn() {
   return (
     <div className="flex flex-row min-h-screen min-w-screen">
       <div className="w-1/2 flex justify-center items-center bg-[#410099]/70 ">
-        <Image src={logo} alt="Decorative" />
+        <Image src={logo} alt="logo" />
       </div>
       <div className="w-1/2 flex justify-center items-center bg-[#16171c]">
         <div className="p-8 bg-[#2C2D32]/70 rounded-md shadow-md max-w-xs mx-auto">
@@ -92,10 +93,9 @@ export default function SignIn() {
             <div className="text-white gap-4">
               You are already logged in. <br />
               Go to{' '}
-              <a href="/" className="text-white underline">
-                {' '}
-                Dashboard
-              </a>
+              <Link href="/">
+                <a className="text-white underline">Dashboard</a>
+              </Link>
               <br />
               <SignOutButton>
                 <button className="text-white bg-[#410099] px-4 py-2 text-center border-none rounded-md w-full transition duration-200 hover:bg-blue-500">
