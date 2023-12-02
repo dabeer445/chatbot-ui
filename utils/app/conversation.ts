@@ -4,6 +4,7 @@ export const updateConversation = (
   updatedConversation: Conversation,
   allConversations: Conversation[],
 ) => {
+  
   const updatedConversations = allConversations.map((c) => {
     if (c.id === updatedConversation.id) {
       return updatedConversation;
@@ -25,6 +26,15 @@ export const saveConversation = (conversation: Conversation) => {
   localStorage.setItem('selectedConversation', JSON.stringify(conversation));
 };
 
-export const saveConversations = (conversations: Conversation[]) => {
+export const saveConversations = async (conversations: Conversation[]) => {
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
+  console.log(1111)
+  await fetch("api/conversations", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body:JSON.stringify({conversations: JSON.stringify(conversations), userId: "cac"}),
+  });
+
 };

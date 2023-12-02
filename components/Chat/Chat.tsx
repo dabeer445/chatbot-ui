@@ -10,6 +10,7 @@ import {
 } from 'react';
 import toast from 'react-hot-toast';
 
+
 import { useTranslation } from 'next-i18next';
 
 import { getEndpoint } from '@/utils/app/api';
@@ -71,6 +72,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   const handleSend = useCallback(
     async (message: Message, deleteCount = 0, plugin: Plugin | null = null) => {
       if (selectedConversation) {
+        console.log(selectedConversation);
         let updatedConversation: Conversation;
         if (deleteCount) {
           const updatedMessages = [...selectedConversation.messages];
@@ -94,6 +96,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
         const chatBody: ChatBody = {
+          convID: selectedConversation.id,
           model: updatedConversation.model,
           messages: updatedConversation.messages,
           key: apiKey,
@@ -211,6 +214,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           }
           homeDispatch({ field: 'conversations', value: updatedConversations });
           saveConversations(updatedConversations);
+          console.log(222)
           homeDispatch({ field: 'messageIsStreaming', value: false });
         } else {
           const { answer } = await response.json();
@@ -348,19 +352,16 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
   }, [messagesEndRef]);
 
   return (
-    <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
+    <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#1F2025] bg-center bg-no-repeat bg-[url('/bg.png')] bg-[length:37rem_7rem] rounded-[2rem]">
       {!(apiKey || serverSideApiKeyIsSet) ? (
         <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
           <div className="text-center text-4xl font-bold text-black dark:text-white">
-            Welcome to Chatbot UI
+            Welcome to Consenna Cogent
           </div>
           <div className="text-center text-lg text-black dark:text-white">
             <div className="mb-8">{`Chatbot UI is an open source clone of OpenAI's ChatGPT UI.`}</div>
-            <div className="mb-2 font-bold">
-              Important: Chatbot UI is 100% unaffiliated with OpenAI.
-            </div>
           </div>
-          <div className="text-center text-gray-500 dark:text-gray-400">
+          {/* <div className="text-center text-gray-500 dark:text-gray-400">
             <div className="mb-2">
               Chatbot UI allows you to plug in your API key to use this UI with
               their API.
@@ -385,14 +386,14 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 openai.com
               </a>
             </div>
-          </div>
+          </div> */}
         </div>
       ) : modelError ? (
         <ErrorMessageDiv error={modelError} />
       ) : (
         <>
           <div
-            className="max-h-full overflow-x-hidden"
+            className="max-h-full overflow-x-hidden p-8"
             ref={chatContainerRef}
             onScroll={handleScroll}
           >
@@ -405,11 +406,11 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         <Spinner size="16px" className="mx-auto" />
                       </div>
                     ) : (
-                      'Chatbot UI'
+                      'Consenna Cogent'
                     )}
                   </div>
 
-                  {models.length > 0 && (
+                  {/* {models.length > 0 && (
                     <div className="flex h-full flex-col space-y-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-600">
                       <ModelSelect />
 
@@ -434,12 +435,12 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                         }
                       />
                     </div>
-                  )}
+                  )} */}
                 </div>
               </>
             ) : (
               <>
-                <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
+                {/* <div className="sticky top-0 z-10 flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
                   {t('Model')}: {selectedConversation?.model.name} | {t('Temp')}
                   : {selectedConversation?.temperature} |
                   <button
@@ -461,7 +462,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                       <ModelSelect />
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {selectedConversation?.messages.map((message, index) => (
                   <MemoizedChatMessage
@@ -482,7 +483,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 {loading && <ChatLoader />}
 
                 <div
-                  className="h-[162px] bg-white dark:bg-[#343541]"
+                  className="h-[162px]"
                   ref={messagesEndRef}
                 />
               </>

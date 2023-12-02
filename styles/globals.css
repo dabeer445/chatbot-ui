@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --hp-logo-height: 3.5rem;
+}
+.h-main{
+  height: calc(100% - var(--hp-logo-height) - 1rem);
+}
 ::-webkit-scrollbar-track {
   background-color: transparent;
 }
@@ -29,7 +35,7 @@
 }
 
 html {
-  background: #202123;
+  background: #16171c;
 }
 
 @media (max-width: 720px) {
@@ -40,4 +46,8 @@ html {
 
 pre:has(div.codeblock) {
   padding: 0;
+}
+
+.prose {
+  max-width: 100% !important;
 }

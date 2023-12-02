@@ -39,6 +39,7 @@ import Promptbar from '@/components/Promptbar';
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
+import hp from '@/assets/hp.png';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
@@ -360,7 +361,7 @@ const Home = ({
       }}
     >
       <Head>
-        <title>Chatbot UI</title>
+        <title>Consenna Cogent</title>
         <meta name="description" content="ChatGPT but better." />
         <meta
           name="viewport"
@@ -379,15 +380,24 @@ const Home = ({
             />
           </div>
 
-          <div className="flex h-full w-full pt-[48px] sm:pt-0">
+          {/* <div className="flex"> */}
+          <div className="flex items-center p-2" >
+            <div className="w-[260px] pl-8">
+              <img src={hp.src} className="w-[--hp-logo-height]" />
+            </div>
+            <div className="text-lg flex flex-1 justify-center text-lg" >{selectedConversation.name}</div>
+          </div>
+
+          <div className="flex h-main w-full pt-[48px] sm:pt-0" >
             <Chatbar />
 
             <div className="flex flex-1">
               <Chat stopConversationRef={stopConversationRef} />
             </div>
 
-            <Promptbar />
+            {/* <Promptbar /> */}
           </div>
+          {/* </div> */}
         </main>
       )}
     </HomeContext.Provider>
