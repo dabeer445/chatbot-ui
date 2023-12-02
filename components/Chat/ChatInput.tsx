@@ -382,7 +382,7 @@ export const ChatInput = ({
         </div>
       </div>
       <div className="px-3 pt-2 pb-3 flex justify-center  text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
-        <Image src={cogent.src} alt="logo" />
+        <Image src={cogent.src} alt="logo" width={200} height={5} />
 
       </div>
     </div>

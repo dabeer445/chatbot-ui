@@ -29,12 +29,12 @@ export const saveConversation = (conversation: Conversation) => {
 export const saveConversations = async (conversations: Conversation[]) => {
   localStorage.setItem('conversationHistory', JSON.stringify(conversations));
   console.log(1111)
-  await fetch("api/conversations", {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body:JSON.stringify({conversations: JSON.stringify(conversations), userId: "cac"}),
-  });
+  // await fetch("api/conversations", {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body:JSON.stringify({conversations: JSON.stringify(conversations), userId: "cac"}),
+  // });
 
 };

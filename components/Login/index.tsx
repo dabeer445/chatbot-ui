@@ -44,7 +44,7 @@ export default function SignIn() {
   return (
     <div className="flex flex-row min-h-screen min-w-screen">
       <div className="w-1/2 flex justify-center items-center bg-[#410099]/70 ">
-        <Image src={logo} alt="logo" />
+        <Image src={logo} alt="logo"  width={250} height={5} />
       </div>
       <div className="w-1/2 flex justify-center items-center bg-[#16171c]">
         <div className="p-8 bg-[#2C2D32]/70 rounded-md shadow-md max-w-xs mx-auto">
@@ -94,7 +94,7 @@ export default function SignIn() {
               You are already logged in. <br />
               Go to{' '}
               <Link href="/">
-                <a className="text-white underline">Dashboard</a>
+                Dashboard
               </Link>
               <br />
               <SignOutButton>
