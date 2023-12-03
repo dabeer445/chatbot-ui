@@ -135,8 +135,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           return;
         }
         // const data= response.body;
+
         const { data, threadId } = await response.json();
-        // console.log(data, typeof data);
         if (!data) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
@@ -160,49 +160,50 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           // let text = '';
           
           // while (!done) {
-          //   if (stopConversationRef.current === true) {
-          //     controller.abort();
-          //     done = true;
-          //     break;
-          //   }
-          //   const { value, done: doneReading } = await reader.read();
-          //   done = doneReading;
-          //   const chunkValue = decoder.decode(value);
-          //   text += chunkValue;
-          //   if (isFirst) {
-          //     isFirst = false;
-          //     const updatedMessages: Message[] = [
-          //       ...updatedConversation.messages,
-          //       { role: 'assistant', content: chunkValue },
-          //     ];
-          //     updatedConversation = {
-          //       ...updatedConversation,
-          //       messages: updatedMessages,
-          //     };
-          //     homeDispatch({
-          //       field: 'selectedConversation',
-          //       value: updatedConversation,
-          //     });
-          //   } else {
-          //     const updatedMessages: Message[] =
-          //       updatedConversation.messages.map((message, index) => {
-          //         if (index === updatedConversation.messages.length - 1) {
-          //           return {
-          //             ...message,
-          //             content: text,
-          //           };
-          //         }
-          //         return message;
-          //       });
-          //     updatedConversation = {
-          //       ...updatedConversation,
-          //       messages: updatedMessages,
-          //     };
-          //     homeDispatch({
-          //       field: 'selectedConversation',
-          //       value: updatedConversation,
-          //     });
-          //   }
+            // if (stopConversationRef.current === true) {
+            //   controller.abort();
+            //   done = true;
+            //   break;
+            // }
+            // const value = await reader.read();
+            // const { value, done: doneReading } = await reader.read();
+            // done = doneReading;
+            // const chunkValue = decoder.decode(value);
+            // text += chunkValue;
+            // if (isFirst) {
+            //   isFirst = false;
+            //   const updatedMessages: Message[] = [
+            //     ...updatedConversation.messages,
+            //     { role: 'assistant', content: chunkValue },
+            //   ];
+            //   updatedConversation = {
+            //     ...updatedConversation,
+            //     messages: updatedMessages,
+            //   };
+            //   homeDispatch({
+            //     field: 'selectedConversation',
+            //     value: updatedConversation,
+            //   });
+            // } else {
+            //   const updatedMessages: Message[] =
+            //     updatedConversation.messages.map((message, index) => {
+            //       if (index === updatedConversation.messages.length - 1) {
+            //         return {
+            //           ...message,
+            //           content: text,
+            //         };
+            //       }
+            //       return message;
+            //     });
+            //   updatedConversation = {
+            //     ...updatedConversation,
+            //     messages: updatedMessages,
+            //   };
+            //   homeDispatch({
+            //     field: 'selectedConversation',
+            //     value: updatedConversation,
+            //   });
+            // }
           // }
           homeDispatch({
             field: 'selectedConversation',

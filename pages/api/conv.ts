@@ -4,6 +4,7 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import clientPromise from '@/utils/mongodb';
 import { ChatBody, Message } from '@/types/chat';
 import OpenAI from 'openai';
+import { queryDatabase } from '@/utils/mysql'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
@@ -27,12 +28,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       const result = await collection.findOne({
         'conversations.id': convID,
       });
-      // console.log(result);
-      if (!result) {
-        throw new Error(`No such conversation found.`);
+      console.log(result)
+      if (result) {
+        conversation = result.conversations.find((conv: { id: string; }) => conv.id === convID);
+        thread_id = conversation.threadId;
       }
-      conversation = result.conversations.find((conv: { id: string; }) => conv.id === convID);
-      thread_id = conversation.threadId;
     }
 
     if (!thread_id) {
@@ -72,29 +72,38 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       // console.log('Ran thread with id: ', run.thread_id);
     }
 
-    // const msg = await openai.beta.threads.messages.create(thread_id, {
-    //   role: 'user',
-    //   content: message.content,
-    // });
-
-    // run = await openai.beta.threads.runs.create(thread_id, {
-    //   assistant_id: OPENAI_ASSISTANT_ID,
-    // });
-
     keepRetrievingRun = await openai.beta.threads.runs.retrieve(thread_id, run.id);
 
     while (keepRetrievingRun.status !== 'completed') {
       // console.log(keepRetrievingRun.status);
       await new Promise(resolve => setTimeout(resolve, 500));
       keepRetrievingRun = await openai.beta.threads.runs.retrieve(thread_id, run.id);
-    }
 
-    // console.log('Thread completed');
+      if (keepRetrievingRun.status == 'requires_action') {
+        const tool_calls:any = keepRetrievingRun?.required_action?.submit_tool_outputs.tool_calls[0]
+        let { query } = JSON.parse(tool_calls.function.arguments)
+        const result = await queryDatabase(query);
+        await openai.beta.threads.runs.submitToolOutputs(
+          thread_id,
+          run.id,
+          {
+            tool_outputs: [
+              {
+                tool_call_id: tool_calls.id,
+                output: JSON.stringify(result),
+              }
+            ],
+          }
+        );
+        // console.log(keepRetrievingRun.required_action.submit_tool_outputs.tool_calls[0].function.arguments)
+        // break;
+      }
+
+    }
 
     const threadMessages = await openai.beta.threads.messages.list(thread_id);
 
-    // res.status(200).send(threadMessages.data[0].content[0].text.value);
-    const lastMes:any = threadMessages.data[0];
+    const lastMes: any = threadMessages.data[0];
     const lastMsgContent = lastMes.content[0].text.value;
     res.status(200).json({
       threadId: run.thread_id,
