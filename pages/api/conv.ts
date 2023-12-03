@@ -94,9 +94,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     const threadMessages = await openai.beta.threads.messages.list(thread_id);
 
     // res.status(200).send(threadMessages.data[0].content[0].text.value);
+    const lastMes:any = threadMessages.data[0];
+    const lastMsgContent = lastMes.content[0].text.value;
     res.status(200).json({
       threadId: run.thread_id,
-      data: threadMessages.data[0].content[0].text.value,
+      data: lastMsgContent,
     });
 
     // return new Response('Success', { status: 201 });

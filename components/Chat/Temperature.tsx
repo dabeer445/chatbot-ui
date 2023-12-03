@@ -19,13 +19,13 @@ export const TemperatureSlider: FC<Props> = ({
     state: { conversations },
   } = useContext(HomeContext);
   const lastConversation = conversations[conversations.length - 1];
-  const [temperature, setTemperature] = useState(
-    lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-  );
+  // const [temperature, setTemperature] = useState(
+  //   lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
+  // );
   const { t } = useTranslation('chat');
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(event.target.value);
-    setTemperature(newValue);
+    // setTemperature(newValue);
     onChangeTemperature(newValue);
   };
 
@@ -40,7 +40,7 @@ export const TemperatureSlider: FC<Props> = ({
         )}
       </span>
       <span className="mt-2 mb-1 text-center text-neutral-900 dark:text-neutral-100">
-        {temperature.toFixed(1)}
+        {/* {temperature.toFixed(1)} */}
       </span>
       <input
         className="cursor-pointer"
@@ -48,7 +48,7 @@ export const TemperatureSlider: FC<Props> = ({
         min={0}
         max={1}
         step={0.1}
-        value={temperature}
+        // value={temperature}
         onChange={handleChange}
       />
       <ul className="w mt-2 pb-8 flex justify-between px-[24px] text-neutral-900 dark:text-neutral-100">

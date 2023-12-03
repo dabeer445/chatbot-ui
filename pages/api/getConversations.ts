@@ -15,7 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         const result = await collection.findOne({
             'userId': userId,
         });
-        res.status(201).json({ conversations: result.conversations || [] });
+        res.status(201).json({ conversations: result?.conversations || [] });
     } catch (error) {
         res.status(500).json({ error: error });
     }

@@ -46,7 +46,7 @@ export const SystemPrompt: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = conversation.model.maxLength;
+    const maxLength = 40000;
 
     if (value.length > maxLength) {
       alert(
@@ -166,13 +166,13 @@ export const SystemPrompt: FC<Props> = ({
     }
   }, [value]);
 
-  useEffect(() => {
-    if (conversation.prompt) {
-      setValue(conversation.prompt);
-    } else {
-      setValue(DEFAULT_SYSTEM_PROMPT);
-    }
-  }, [conversation]);
+  // useEffect(() => {
+  //   if (conversation.prompt) {
+  //     setValue(conversation.prompt);
+  //   } else {
+  //     setValue(DEFAULT_SYSTEM_PROMPT);
+  //   }
+  // }, [conversation]);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
