@@ -46,6 +46,22 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
 
 export interface Thread {
   id: string,
+  object: string,
+  created_at: number,
+  assistant_id: string,
+  thread_id: string,
+  status: string,
+  started_at: number | null,
+  expires_at: number | null,
+  cancelled_at: number | null,
+  failed_at: number | null,
+  completed_at: number | null,
+  last_error: number | null,
+  model: string,
+  instructions: string,
+  tools: [],
+  file_ids: [],
+  metadata: {}
 }
 export interface Message {
   id: string,
@@ -55,8 +71,8 @@ export interface Message {
   role: string,
   content: [],
   file_ids: [],
-  assistant_id: string | null ,
-  run_id: string | null ,
+  assistant_id: string | null,
+  run_id: string | null,
   metadata: {}
 
 }

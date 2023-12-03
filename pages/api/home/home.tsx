@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import Image from 'next/image';
-import { useUser } from "@clerk/nextjs";
+
 import { useCreateReducer } from '@/hooks/useCreateReducer';
 
 import useErrorService from '@/services/errorService';
@@ -18,6 +18,7 @@ import {
 } from '@/utils/app/clean';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE } from '@/utils/app/const';
 import {
+  getConversations,
   saveConversation,
   saveConversations,
   updateConversation,
@@ -41,6 +42,7 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import hp from '@/assets/hp.png';
+import { useUser } from '@clerk/nextjs';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
@@ -55,8 +57,10 @@ const Home = ({
   defaultModelId,
 }: Props) => {
   const { t } = useTranslation('chat');
-  const { getModels } = useApiService();
-  const { getModelsError } = useErrorService();
+  // const { getModels } = useApiService();
+  const { getConversations } = useApiService();
+
+  // const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
   const contextValue = useCreateReducer<HomeInitialState>({
@@ -79,6 +83,23 @@ const Home = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
+  const { data, error, refetch } = useQuery(
+    [user],
+    ({ signal }) => {
+      if (!user) return null;
+
+      return getConversations(
+        {
+          userId: user.id,
+        },
+        signal,
+      );
+    },
+    { enabled: true, refetchOnMount: false },
+  );
+  useEffect(() => {
+    if (data) dispatch({ field: 'conversations', value: data.conversations });
+  }, [data, dispatch]);
   // const { data, error, refetch } = useQuery(
   //   ['GetModels', apiKey, serverSideApiKeyIsSet],
   //   ({ signal }) => {
@@ -94,9 +115,6 @@ const Home = ({
   //   { enabled: true, refetchOnMount: false },
   // );
 
-  // useEffect(() => {
-  //   if (data) dispatch({ field: 'models', value: data });
-  // }, [data, dispatch]);
 
   // useEffect(() => {
   //   dispatch({ field: 'modelError', value: getModelsError(error) });
@@ -114,7 +132,6 @@ const Home = ({
   };
 
   // FOLDER OPERATIONS  --------------------------------------------
-
   const handleCreateFolder = (name: string, type: FolderType) => {
     const newFolder: FolderInterface = {
       id: uuidv4(),
@@ -175,19 +192,20 @@ const Home = ({
     });
 
     dispatch({ field: 'folders', value: updatedFolders });
-  
+
     saveFolders(updatedFolders);
   };
 
   // CONVERSATION OPERATIONS  --------------------------------------------
 
-  const handleNewConversation = () => {
+  const handleNewConversation = async () => {
     const lastConversation = conversations[conversations.length - 1];
-
     const newConversation: Conversation = {
       id: uuidv4(),
       name: t('New Conversation'),
       messages: [],
+      threadId: '',
+      folderId: null,
       // model: lastConversation?.model || {
       //   id: OpenAIModels[defaultModelId].id,
       //   name: OpenAIModels[defaultModelId].name,
@@ -196,7 +214,6 @@ const Home = ({
       // },
       // prompt: DEFAULT_SYSTEM_PROMPT,
       // temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-      folderId: null,
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -222,7 +239,7 @@ const Home = ({
     const { single, all } = updateConversation(
       updatedConversation,
       conversations,
-      user?.id
+      user?.id,
     );
     dispatch({ field: 'selectedConversation', value: single });
     dispatch({ field: 'conversations', value: all });
@@ -305,16 +322,23 @@ const Home = ({
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
     }
 
-    const conversationHistory = localStorage.getItem('conversationHistory');
-    if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] =
-        JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(
-        parsedConversationHistory,
-      );
+    // const conversationHistory = localStorage.getItem('conversationHistory');
+    // const getConvo = async () => {
+    //   console.log(user, user);
+    //   const conversationHistory = await getConversations(user?.id);
+    //   if (conversationHistory) {
+    //     // const parsedConversationHistory: Conversation[] =
+    //     //   JSON.parse(conversationHistory);
+    //     // const cleanedConversationHistory = cleanConversationHistory(
+    //     //   parsedConversationHistory,
+    //     // );
+    //     const cleanedConversationHistory =
+    //       cleanConversationHistory(conversationHistory);
 
-      dispatch({ field: 'conversations', value: cleanedConversationHistory });
-    }
+    //     dispatch({ field: 'conversations', value: cleanedConversationHistory });
+    //   }
+    // };
+    // getConvo();
 
     const selectedConversation = localStorage.getItem('selectedConversation');
     if (selectedConversation) {
@@ -336,10 +360,11 @@ const Home = ({
           id: uuidv4(),
           name: t('New Conversation'),
           messages: [],
+          folderId: null,
+          threadId: null,
           // model: OpenAIModels[defaultModelId],
           // prompt: DEFAULT_SYSTEM_PROMPT,
           // temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
-          folderId: null,
         },
       });
     }
@@ -371,7 +396,6 @@ const Home = ({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (
-        
         <main
           className={`flex h-screen w-screen flex-col text-sm text-white dark:text-white ${lightMode}`}
         >
@@ -383,16 +407,24 @@ const Home = ({
           </div>
 
           {/* <div className="flex"> */}
-          <div className="flex items-center p-2" >
+          <div className="flex items-center p-2">
             <div className="w-[260px] pl-8">
-              <Image src={hp.src} alt="logo"  width={45} height={45} className="w-[--hp-logo-height]" />
+              <Image
+                src={hp.src}
+                alt="logo"
+                width={45}
+                height={45}
+                className="w-[--hp-logo-height]"
+              />
             </div>
-            <div className="text-lg flex flex-1 justify-center text-lg" >{selectedConversation.name}</div>
+            <div className="text-lg flex flex-1 justify-center text-lg">
+              {selectedConversation.name}
+            </div>
             {user?.id}
             {/* <div className="text-lg flex flex-1 justify-center text-lg" >{selectedConversation.name}</div> */}
           </div>
 
-          <div className="flex h-main w-full pt-[48px] sm:pt-0" >
+          <div className="flex h-main w-full pt-[48px] sm:pt-0">
             <Chatbar />
 
             <div className="flex flex-1">

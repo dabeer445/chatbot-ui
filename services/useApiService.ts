@@ -5,6 +5,12 @@ import { useFetch } from '@/hooks/useFetch';
 export interface GetModelsRequestProps {
   key: string;
 }
+export interface GetConversationsRequestProps {
+  userId: string;
+}
+export interface GetConversationsResponseProps {
+  conversations: [];
+}
 
 const useApiService = () => {
   const fetchService = useFetch();
@@ -25,10 +31,23 @@ const useApiService = () => {
   // 	[fetchService]
   // );
 
-  const getModels = useCallback(
-    (params: GetModelsRequestProps, signal?: AbortSignal) => {
-      return fetchService.post<GetModelsRequestProps>(`/api/models`, {
-        body: { key: params.key },
+  // const getModels = useCallback(
+  //   (params: GetModelsRequestProps, signal?: AbortSignal) => {
+  //     return fetchService.post<GetModelsRequestProps>(`/api/models`, {
+  //       body: { key: params.key },
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       signal,
+  //     });
+  //   },
+  //   [fetchService],
+  // );
+
+  const getConversations = useCallback(
+    (params: GetConversationsRequestProps, signal?: AbortSignal) => {
+      return fetchService.post<GetConversationsResponseProps>(`/api/getConversations`, {
+        body: { userId: params.userId },
         headers: {
           'Content-Type': 'application/json',
         },
@@ -39,7 +58,7 @@ const useApiService = () => {
   );
 
   return {
-    getModels,
+    getConversations,
   };
 };
 

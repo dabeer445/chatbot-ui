@@ -1,6 +1,7 @@
 const OpenAI = require('openai');
 // import { OpenAI } from 'openai';
 const { MongoClient, ServerApiVersion } = require('mongodb');
+// const mongoose = require('mongoose')
 
 const uri =
   'mongodb+srv://dabeer445:CEnnrhnm0ysix8P6@consenna.xkh2alz.mongodb.net/?retryWrites=true&w=majority';
@@ -70,6 +71,7 @@ async function ma() {
       deprecationErrors: true,
     },
   });
+  // mongoose
   await client.connect();
   const db = client.db("test");
   const collection = db.collection('users');
@@ -184,22 +186,44 @@ async function ma() {
 //       },
 //     ],
 //   });
-conversationId = "e005586c-2045-42a1-b42d"
+conversationId = "b4ab10dd-6259-4465-b288-75cf916bf990"
+user_id= 'user_2YU0pF73npoA2AHerT1u1tEjIsV'
+conversations=['a','asd','asd']
 const result = await collection.findOne({
-    'conversations.id': conversationId,
+  'userId': user_id,
+  // 'conversations.id': conversationId,
   });
-  if (result) {
-    // Extract the threadId from the matching conversation
-    const conversation = result.conversations.find(conv => conv.id === conversationId);
-    const threadId = conversation.threadId;
-
-    console.log(`Thread ID for conversation ID ${conversationId}: ${threadId}`);
-    return threadId;
-  } else {
-    console.log(`Conversation ID ${conversationId} not found`);
-    return null;
-  }
   console.log(result);
+  // if (result) {
+  //   await collection.updateOne(
+  //     { 'userId': user_id },
+  //     {
+  //       $set: { 'conversations': conversations },
+  //     }
+  //   );
+  // }else{
+  //   await collection.insertOne(req.body)
+  // }
+
+  // if (result) {
+  //   // Extract the threadId from the matching conversation
+  //   const conversation = result.conversations.find(conv => conv.id === conversationId);
+  //   const threadId = conversation.threadId;
+  //   if(!threadId){
+  //     console.log(`Thread ID not defined for conversation ID ${conversationId}`);
+  //   return null;
+
+  //   }
+  //   console.log(`Thread ID for conversation ID ${conversationId}: ${threadId}`);
+  //   return threadId;
+  // } else {
+  //   console.log(`Conversation ID ${conversationId} not found`);
+  //   return null;
+  // }
+  // console.log(result);
 }
+// async function mongo(){
+
+// }
 ma();
 // console.log(ma());

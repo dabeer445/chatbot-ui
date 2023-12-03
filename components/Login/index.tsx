@@ -32,7 +32,7 @@ export default function SignIn() {
           setActive({ session: result.createdSessionId });
           //   router.push('/');
         } else {
-          console.log(result);
+          // console.log(result);
         }
       })
       .catch((err) => console.error('error', err));

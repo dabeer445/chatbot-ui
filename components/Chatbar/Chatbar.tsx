@@ -116,19 +116,20 @@ export const Chatbar = () => {
   };
 
   const handleClearConversations = () => {
+    const newConversation = {
+      id: uuidv4(),
+      name: t('New Conversation'),
+      messages: [],
+      folderId: null,
+      threadId: null,
+    };
     defaultModelId &&
       homeDispatch({
         field: 'selectedConversation',
-        value: {
-          id: uuidv4(),
-          name: t('New Conversation'),
-          messages: [],
-          model: OpenAIModels[defaultModelId],
-          prompt: DEFAULT_SYSTEM_PROMPT,
-          temperature: DEFAULT_TEMPERATURE,
-          folderId: null,
-        },
+        value: newConversation,
       });
+  
+      saveConversations([newConversation], user?.id);
 
     homeDispatch({ field: 'conversations', value: [] });
 
@@ -165,9 +166,9 @@ export const Chatbar = () => {
             id: uuidv4(),
             name: t('New Conversation'),
             messages: [],
-            model: OpenAIModels[defaultModelId],
-            prompt: DEFAULT_SYSTEM_PROMPT,
-            temperature: DEFAULT_TEMPERATURE,
+            // model: OpenAIModels[defaultModelId],
+            // prompt: DEFAULT_SYSTEM_PROMPT,
+            // temperature: DEFAULT_TEMPERATURE,
             folderId: null,
           },
         });

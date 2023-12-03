@@ -13,27 +13,27 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
   let updatedConversation = conversation;
 
   // check for model on each conversation
-  if (!updatedConversation.model) {
-    updatedConversation = {
-      ...updatedConversation,
-      model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5],
-    };
-  }
+  // if (!updatedConversation.model) {
+  //   updatedConversation = {
+  //     ...updatedConversation,
+  //     model: updatedConversation.model || OpenAIModels[OpenAIModelID.GPT_3_5],
+  //   };
+  // }
 
   // check for system prompt on each conversation
-  if (!updatedConversation.prompt) {
-    updatedConversation = {
-      ...updatedConversation,
-      prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT,
-    };
-  }
+  // if (!updatedConversation.prompt) {
+  //   updatedConversation = {
+  //     ...updatedConversation,
+  //     prompt: updatedConversation.prompt || DEFAULT_SYSTEM_PROMPT,
+  //   };
+  // }
 
-  if (!updatedConversation.temperature) {
-    updatedConversation = {
-      ...updatedConversation,
-      temperature: updatedConversation.temperature || DEFAULT_TEMPERATURE,
-    };
-  }
+  // if (!updatedConversation.temperature) {
+  //   updatedConversation = {
+  //     ...updatedConversation,
+  //     temperature: updatedConversation.temperature || DEFAULT_TEMPERATURE,
+  //   };
+  // }
 
   if (!updatedConversation.folderId) {
     updatedConversation = {
@@ -46,6 +46,13 @@ export const cleanSelectedConversation = (conversation: Conversation) => {
     updatedConversation = {
       ...updatedConversation,
       messages: updatedConversation.messages || [],
+    };
+  }
+
+  if (!updatedConversation.threadId) {
+    updatedConversation = {
+      ...updatedConversation,
+      threadId: updatedConversation.threadId || '',
     };
   }
 
@@ -66,16 +73,20 @@ export const cleanConversationHistory = (history: any[]): Conversation[] => {
 
   return history.reduce((acc: any[], conversation) => {
     try {
-      if (!conversation.model) {
-        conversation.model = OpenAIModels[OpenAIModelID.GPT_3_5];
-      }
+      // if (!conversation.model) {
+      //   conversation.model = OpenAIModels[OpenAIModelID.GPT_3_5];
+      // }
 
-      if (!conversation.prompt) {
-        conversation.prompt = DEFAULT_SYSTEM_PROMPT;
-      }
+      // if (!conversation.prompt) {
+      //   conversation.prompt = DEFAULT_SYSTEM_PROMPT;
+      // }
 
-      if (!conversation.temperature) {
-        conversation.temperature = DEFAULT_TEMPERATURE;
+      // if (!conversation.temperature) {
+      //   conversation.temperature = DEFAULT_TEMPERATURE;
+      // }
+
+      if (!conversation.threadId) {
+        conversation.threadId = '';
       }
 
       if (!conversation.folderId) {

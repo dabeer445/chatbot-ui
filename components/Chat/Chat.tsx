@@ -9,8 +9,6 @@ import {
   useState,
 } from 'react';
 import toast from 'react-hot-toast';
-import { useUser } from "@clerk/nextjs";
-
 
 import { useTranslation } from 'next-i18next';
 
@@ -31,10 +29,12 @@ import Spinner from '../Spinner';
 import { ChatInput } from './ChatInput';
 import { ChatLoader } from './ChatLoader';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
+import { MemoizedChatMessage } from './MemoizedChatMessage';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
 import { TemperatureSlider } from './Temperature';
-import { MemoizedChatMessage } from './MemoizedChatMessage';
+
+import { useUser } from '@clerk/nextjs';
 
 interface Props {
   stopConversationRef: MutableRefObject<boolean>;
@@ -99,8 +99,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         homeDispatch({ field: 'messageIsStreaming', value: true });
         const chatBody: ChatBody = {
           convID: selectedConversation.id,
+          threadId: selectedConversation.threadId,
           messages: updatedConversation.messages,
-          key: apiKey,
           // model: updatedConversation.model,
           // prompt: updatedConversation.prompt,
           // temperature: updatedConversation.temperature,
@@ -135,7 +135,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           toast.error(response.statusText);
           return;
         }
-        const data = response.body;
+        // const data= response.body;
+        const { data, threadId } = await response.json();
+        // console.log(data, typeof data);
         if (!data) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
@@ -152,56 +154,64 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             };
           }
           homeDispatch({ field: 'loading', value: false });
-          const reader = data.getReader();
-          const decoder = new TextDecoder();
-          let done = false;
-          let isFirst = true;
-          let text = '';
-          while (!done) {
-            if (stopConversationRef.current === true) {
-              controller.abort();
-              done = true;
-              break;
-            }
-            const { value, done: doneReading } = await reader.read();
-            done = doneReading;
-            const chunkValue = decoder.decode(value);
-            text += chunkValue;
-            if (isFirst) {
-              isFirst = false;
-              const updatedMessages: Message[] = [
-                ...updatedConversation.messages,
-                { role: 'assistant', content: chunkValue },
-              ];
-              updatedConversation = {
-                ...updatedConversation,
-                messages: updatedMessages,
-              };
-              homeDispatch({
-                field: 'selectedConversation',
-                value: updatedConversation,
-              });
-            } else {
-              const updatedMessages: Message[] =
-                updatedConversation.messages.map((message, index) => {
-                  if (index === updatedConversation.messages.length - 1) {
-                    return {
-                      ...message,
-                      content: text,
-                    };
-                  }
-                  return message;
-                });
-              updatedConversation = {
-                ...updatedConversation,
-                messages: updatedMessages,
-              };
-              homeDispatch({
-                field: 'selectedConversation',
-                value: updatedConversation,
-              });
-            }
-          }
+          // const reader = data.getReader();
+          // const decoder = new TextDecoder();
+          // let done = false;
+          // let isFirst = true;
+          // let text = '';
+          
+          // while (!done) {
+          //   if (stopConversationRef.current === true) {
+          //     controller.abort();
+          //     done = true;
+          //     break;
+          //   }
+          //   const { value, done: doneReading } = await reader.read();
+          //   done = doneReading;
+          //   const chunkValue = decoder.decode(value);
+          //   text += chunkValue;
+          //   if (isFirst) {
+          //     isFirst = false;
+          //     const updatedMessages: Message[] = [
+          //       ...updatedConversation.messages,
+          //       { role: 'assistant', content: chunkValue },
+          //     ];
+          //     updatedConversation = {
+          //       ...updatedConversation,
+          //       messages: updatedMessages,
+          //     };
+          //     homeDispatch({
+          //       field: 'selectedConversation',
+          //       value: updatedConversation,
+          //     });
+          //   } else {
+          //     const updatedMessages: Message[] =
+          //       updatedConversation.messages.map((message, index) => {
+          //         if (index === updatedConversation.messages.length - 1) {
+          //           return {
+          //             ...message,
+          //             content: text,
+          //           };
+          //         }
+          //         return message;
+          //       });
+          //     updatedConversation = {
+          //       ...updatedConversation,
+          //       messages: updatedMessages,
+          //     };
+          //     homeDispatch({
+          //       field: 'selectedConversation',
+          //       value: updatedConversation,
+          //     });
+          //   }
+          // }
+          homeDispatch({
+            field: 'selectedConversation',
+            value: updatedConversation,
+          });
+
+          updatedConversation.threadId = threadId;
+          updatedConversation.messages = [...updatedConversation.messages, {role: 'assistant', content: data}];
           saveConversation(updatedConversation, user?.id);
           const updatedConversations: Conversation[] = conversations.map(
             (conversation) => {
@@ -483,10 +493,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
 
                 {loading && <ChatLoader />}
 
-                <div
-                  className="h-[162px]"
-                  ref={messagesEndRef}
-                />
+                <div className="h-[162px]" ref={messagesEndRef} />
               </>
             )}
           </div>

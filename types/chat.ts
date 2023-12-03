@@ -10,7 +10,7 @@ export type Role = 'assistant' | 'user';
 export interface ChatBody {
   convID: string;
   messages: Message[];
-  key: string;
+  threadId: string | null;
   // model: OpenAIModel;
   // prompt: string;
   // temperature: number;
@@ -21,6 +21,7 @@ export interface Conversation {
   name: string;
   messages: Message[];
   folderId: string | null;
+  threadId: string | null;
   // model: OpenAIModel;
   // prompt: string;
   // temperature: number;

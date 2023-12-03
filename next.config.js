@@ -13,6 +13,10 @@ const nextConfig = {
 
     return config;
   },
+  experimental: {
+    esmExternals: "loose", // <-- add this
+    serverComponentsExternalPackages: ["mongoose","mongodb"] // <-- and this
+  },
 };
 
 module.exports = nextConfig;
