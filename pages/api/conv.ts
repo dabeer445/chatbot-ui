@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { OPENAI_API_KEY, OPENAI_ASSISTANT_ID } from '@/utils/app/const';
+import { LF_DEBUG, OPENAI_API_KEY, OPENAI_ASSISTANT_ID } from '@/utils/app/const';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import clientPromise from '@/utils/mongodb';
 import { ChatBody, Message } from '@/types/chat';
@@ -149,16 +149,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     const threadMessages = await openai.beta.threads.messages.list(thread_id);
 
     const lastMes: any = threadMessages.data[0];
-    const lastMsgContent = lastMes.content[0].text.value;
-    console.log(lastMsgContent);
+    let data = lastMes.content[0].text.value;
+    console.log(data);
+
+    if (LF_DEBUG) {
+      data = `Query: ${mainQuery} \n\n\n\n ${data}`
+    }
 
     res.status(200).json({
       threadId: run.thread_id,
-      data: lastMsgContent,
+      data: data,
       query: mainQuery,
       queryResult: queryResult,
     });
-
     // return new Response('Success', { status: 201 });
   } catch (error) {
     res.status(500).json({ error: error });

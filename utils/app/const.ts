@@ -40,3 +40,6 @@ export const MYSQL_PASS =
 
 export const MYSQL_DB =
   process.env.MYSQL_DB || '';
+
+  export const LF_DEBUG =
+  process.env.LF_DEBUG || true;

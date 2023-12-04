@@ -1,17 +1,19 @@
 const OpenAI = require('openai');
-const {process} = require('dotenv')
+// const {process} = require('dotenv')
 // import { OpenAI } from 'openai';
 const { MongoClient, ServerApiVersion } = require('mongodb');
 // const mongoose = require('mongoose')
 // import mysql from 'mysql2/promise';
 const mysql = require('mysql2/promise');
 const { create } = require('domain');
+const fs = require('fs');
+
 const uri =
   'mongodb+srv://dabeer445:CEnnrhnm0ysix8P6@consenna.xkh2alz.mongodb.net/?retryWrites=true&w=majority';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Replace with your OpenAI API key
-});
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY, // Replace with your OpenAI API key
+// });
 let threadID = 'thread_do7JgezgQemZTcPE18Y3035o',
   userMessage = 'remove the investment part.',
   assistantIdToUse = 'asst_cMgdFuNok7dXxauOun9iWprw';
@@ -350,11 +352,52 @@ async function listAssistant() {
   
   console.log(myAssistants.data);
 }
+
+async function fetchAndWrite() {
+  try {
+    // Your SQL query to fetch all rows from the table
+    const sqlQuery = 'SELECT * FROM devices';
+
+    // Execute the query
+    const rows = await queryDatabase(sqlQuery);
+
+    // Create an object to store unique values for each column
+    const uniqueValues = {};
+
+    // Iterate over rows to find unique values
+    rows.forEach(row => {
+      Object.keys(row).forEach(column => {
+        if (!uniqueValues[column]) {
+          uniqueValues[column] = new Set();
+        }
+        uniqueValues[column].add(row[column]);
+      });
+    });
+
+    // Convert Sets to arrays
+    Object.keys(uniqueValues).forEach(column => {
+      uniqueValues[column] = Array.from(uniqueValues[column]);
+    });
+
+    // Write the result to a file (assuming a JSON file)
+    const fileName = 'uniqueValues.json';
+    fs.writeFileSync(fileName, JSON.stringify(uniqueValues, null, 2));
+
+    console.log('Data written to', fileName);
+  } catch (error) {
+    console.error('Error fetching and writing data:', error);
+  } finally {
+    // Close the database connection pool
+    pool.end();
+  }
+}
 // actions();
 // createAssistant();
-listAssistant();
+// listAssistant();
 // console.log(ma());
 
 // console.log(queryDatabase("ALTER TABLE `devices` CHANGE `on-board_graphics_card_model` `on_board_graphics_card_model` TEXT"))
 // console.log(queryDatabase("SELECT sku, title, datasheet FROM devices WHERE processor_manufacturer = 'Intel' AND processor_family like '%i9%' AND category = 'Laptops' LIMIT 5;"))
+// console.log(queryDatabase("SELECT * FROM devices;"))
 // deleteAssistant()
+fetchAndWrite();
