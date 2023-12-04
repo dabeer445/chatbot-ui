@@ -15,10 +15,10 @@ let threadID = 'thread_do7JgezgQemZTcPE18Y3035o',
   userMessage = 'remove the investment part.',
   assistantIdToUse = 'asst_cMgdFuNok7dXxauOun9iWprw';
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'consenna',
+  host: '35.214.83.148',
+  user: 'ua11dgv74jhz6',
+  password: 'mu9wsuqsgej0',
+  database: 'dbqlrvzntomopa',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -28,6 +28,7 @@ async function queryDatabase(query) {
 
   try {
     const [rows] = await connection.query(query);
+    console.log(rows)
     return rows;
   } finally {
     connection.release();
@@ -336,5 +337,8 @@ async function createAssistant() {
 }
 
 // actions();
-createAssistant();
+// createAssistant();
 // console.log(ma());
+
+// console.log(queryDatabase("ALTER TABLE `devices` CHANGE `on-board_graphics_card_model` `on_board_graphics_card_model` TEXT"))
+console.log(queryDatabase("Select * from devices LIMIT 1;"))

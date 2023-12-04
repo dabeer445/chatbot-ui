@@ -31,14 +31,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       const result = await collection.findOne({
         'conversations.id': convID,
       });
-      console.log(result)
+      // console.log(result)
       if (result) {
         conversation = result.conversations.find((conv: { id: string; }) => conv.id === convID);
         thread_id = conversation.threadId;
       }
     }
+    // console.log(thread_id)
 
     if (!thread_id) {
+      // console.log("2>",thread_id)
       // console.log('No thread for this convo');
       run = await openai.beta.threads.createAndRun({
         assistant_id: OPENAI_ASSISTANT_ID,
@@ -62,6 +64,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       thread_id = run.thread_id
     } else {
       // console.log('Thread with id: ', conversation.threadId, ' exists for ConvId: ', conversation.id);
+      // console.log("3>",thread_id)
 
       const msg = await openai.beta.threads.messages.create(thread_id, {
         role: 'user',
@@ -108,6 +111,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     const lastMes: any = threadMessages.data[0];
     const lastMsgContent = lastMes.content[0].text.value;
+    // console.log(lastMsgContent);
+
     res.status(200).json({
       threadId: run.thread_id,
       data: lastMsgContent,
