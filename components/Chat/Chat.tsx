@@ -131,7 +131,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
-          toast.error(response.statusText);
+          const { data, threadId } = await response.json();
+
+          toast.error(data);
           return;
         }
         // const data= response.body;

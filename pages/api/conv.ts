@@ -139,7 +139,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     if (keepRetrievingRun.status == 'failed') {
       console.log(keepRetrievingRun)
-      throw new Error(JSON.stringify(keepRetrievingRun));
+      res.status(500).json({
+        threadId: run.thread_id,
+        data: keepRetrievingRun.last_error?.message,
+        query: mainQuery,
+        queryResult: queryResult,
+      });
     }
     const threadMessages = await openai.beta.threads.messages.list(thread_id);
 
