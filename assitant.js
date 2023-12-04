@@ -1,4 +1,5 @@
 const OpenAI = require('openai');
+const {process} = require('dotenv')
 // import { OpenAI } from 'openai';
 const { MongoClient, ServerApiVersion } = require('mongodb');
 // const mongoose = require('mongoose')
@@ -9,8 +10,7 @@ const uri =
   'mongodb+srv://dabeer445:CEnnrhnm0ysix8P6@consenna.xkh2alz.mongodb.net/?retryWrites=true&w=majority';
 
 const openai = new OpenAI({
-  // apiKey: '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', // Replace with your OpenAI API key
-  apiKey: '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', // Replace with your OpenAI API key
+  apiKey: process.env.OPENAI_API_KEY, // Replace with your OpenAI API key
 });
 let threadID = 'thread_do7JgezgQemZTcPE18Y3035o',
   userMessage = 'remove the investment part.',
@@ -342,8 +342,17 @@ async function deleteAssistant() {
 
   console.log(myAssistant);
 }
+async function listAssistant() {
+  const myAssistants = await openai.beta.assistants.list({
+    order: "desc",
+    limit: "20",
+  });
+  
+  console.log(myAssistants.data);
+}
 // actions();
-createAssistant();
+// createAssistant();
+listAssistant();
 // console.log(ma());
 
 // console.log(queryDatabase("ALTER TABLE `devices` CHANGE `on-board_graphics_card_model` `on_board_graphics_card_model` TEXT"))

@@ -31,13 +31,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       const result = await collection.findOne({
         'conversations.id': convID,
       });
-      // console.log(result)
+      console.log(result)
       if (result) {
         conversation = result.conversations.find((conv: { id: string; }) => conv.id === convID);
         thread_id = conversation.threadId;
       }
     }
-    // console.log(thread_id)
+    console.log(thread_id)
 
     if (!thread_id) {
       // console.log("2>",thread_id)
@@ -49,7 +49,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         },
       });
 
-      // console.log('Created and ran thread with id: ', run.thread_id);
+      console.log('Created and ran thread with id: ', run.thread_id);
 
       await collection?.updateOne(
         { 'conversations.id': convID },
@@ -58,7 +58,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         }
       );
 
-      // console.log('Attached thread with id: ', run.thread_id, ' to ConvId: ', conversation.id);
+      console.log('Attached thread with id: ', run.thread_id, ' to ConvId: ', conversation.id);
 
       conversation.threadId = run.thread_id;
       thread_id = run.thread_id
@@ -78,19 +78,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       // console.log('Ran thread with id: ', run.thread_id);
     }
 
+    console.log("Retrieving Run Now")
     keepRetrievingRun = await openai.beta.threads.runs.retrieve(thread_id, run.id);
     console.log(keepRetrievingRun)
 
     while (keepRetrievingRun.status !== 'completed' && keepRetrievingRun.status !== 'failed') {
     // while (keepRetrievingRun.status !== 'completed' || keepRetrievingRun.status !== 'failed') {
       console.log(keepRetrievingRun.status);
-      await new Promise(resolve => setTimeout(resolve, 100));
       keepRetrievingRun = await openai.beta.threads.runs.retrieve(thread_id, run.id);
 
       if (keepRetrievingRun.status == 'requires_action') {
         const tool_calls:any = keepRetrievingRun?.required_action?.submit_tool_outputs.tool_calls[0]
         let { query } = JSON.parse(tool_calls.function.arguments)
         console.log(query);
+        if (query.search("LIMIT")<0){
+          query = query.replace(";",'') + " LIMIT 5"
+        }
         const result = await queryDatabase(query);
         console.log(result);
         await openai.beta.threads.runs.submitToolOutputs(
@@ -108,6 +111,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         // console.log(keepRetrievingRun.required_action.submit_tool_outputs.tool_calls[0].function.arguments)
         // break;
       }
+      await new Promise(resolve => setTimeout(resolve, 100));
 
     }
 

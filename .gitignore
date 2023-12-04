@@ -1,5 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-/assitant.js
+assitant.js
 
 # dependencies
 /node_modules
@@ -39,3 +39,4 @@ yarn-error.log*
 next-env.d.ts
 .idea
 pnpm-lock.yaml
+assitant.js
