@@ -18,8 +18,30 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
     const message: Message = messages[messages.length - 1];
+    const modifyQuery = (query: string) => {
+      // Check if the query contains a WHERE clause
+      const whereIndex = query.toUpperCase().indexOf('WHERE');
 
-    let run, keepRetrievingRun, conversation, mongo_client, db, collection;
+      if (whereIndex !== -1) {
+        // Extract the WHERE clause
+        const whereClause = query.substring(whereIndex + 5);
+
+        // Replace '=' with 'LIKE'
+        const modifiedClause = whereClause.replace(/(\S+)\s*=\s*'([^']*)'/g, "$1 LIKE '%$2%'");
+
+        // Replace the original WHERE clause with the modified one
+        query = query.substring(0, whereIndex + 5) + modifiedClause;
+      }
+
+      if (query.toUpperCase().search("LIMIT") === -1) {
+        // Add LIMIT 5 if no LIMIT clause exists
+        query += ' LIMIT 5';
+      }
+      // Return the original query if no WHERE clause is found
+      return query;
+    }
+
+    let run, keepRetrievingRun, conversation, mongo_client, db, collection, mainQuery, queryResult;
 
     if (!thread_id) {
       mongo_client = await clientPromise; // Connect to MongoDB using the existing clientPromise
@@ -83,18 +105,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     console.log(keepRetrievingRun)
 
     while (keepRetrievingRun.status !== 'completed' && keepRetrievingRun.status !== 'failed') {
-    // while (keepRetrievingRun.status !== 'completed' || keepRetrievingRun.status !== 'failed') {
+      // while (keepRetrievingRun.status !== 'completed' || keepRetrievingRun.status !== 'failed') {
       console.log(keepRetrievingRun.status);
       keepRetrievingRun = await openai.beta.threads.runs.retrieve(thread_id, run.id);
 
       if (keepRetrievingRun.status == 'requires_action') {
-        const tool_calls:any = keepRetrievingRun?.required_action?.submit_tool_outputs.tool_calls[0]
+        const tool_calls: any = keepRetrievingRun?.required_action?.submit_tool_outputs.tool_calls[0]
         let { query } = JSON.parse(tool_calls.function.arguments)
-        console.log(query);
-        if (query.search("LIMIT")<0){
-          query = query.replace(";",'') + " LIMIT 5"
-        }
+        query = modifyQuery(query);
+        mainQuery = query
+        console.log("query", query);
         const result = await queryDatabase(query);
+        queryResult = result
         console.log(result);
         await openai.beta.threads.runs.submitToolOutputs(
           thread_id,
@@ -115,7 +137,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     }
 
-    if(keepRetrievingRun.status == 'failed'){
+    if (keepRetrievingRun.status == 'failed') {
       console.log(keepRetrievingRun)
       throw new Error(JSON.stringify(keepRetrievingRun));
     }
@@ -128,6 +150,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     res.status(200).json({
       threadId: run.thread_id,
       data: lastMsgContent,
+      query: mainQuery,
+      queryResult: queryResult,
     });
 
     // return new Response('Success', { status: 201 });
