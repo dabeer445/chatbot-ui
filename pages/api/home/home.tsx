@@ -67,7 +67,6 @@ const Home = ({
     initialState,
   });
   const { isLoaded, isSignedIn, user } = useUser();
-
   const {
     state: {
       apiKey,
@@ -420,7 +419,7 @@ const Home = ({
             <div className="text-lg flex flex-1 justify-center text-lg">
               {selectedConversation.name}
             </div>
-            {user?.id}
+            {user?.primaryEmailAddress?.emailAddress}
             {/* <div className="text-lg flex flex-1 justify-center text-lg" >{selectedConversation.name}</div> */}
           </div>
 
