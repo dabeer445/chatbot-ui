@@ -1,4 +1,3 @@
-export const maxDuration = 300;
 import { NextApiRequest, NextApiResponse } from 'next';
 import { OPENAI_API_KEY, OPENAI_ASSISTANT_ID } from '@/utils/app/const';
 import { MongoClient, ServerApiVersion } from 'mongodb';
@@ -7,6 +6,9 @@ import { ChatBody, Message } from '@/types/chat';
 import OpenAI from 'openai';
 import { queryDatabase } from '@/utils/mysql'
 
+export const config = {
+  maxDuration: 300,
+};
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
   try {
