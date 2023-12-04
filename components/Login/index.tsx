@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,6 +15,12 @@ export default function SignIn() {
   const router = useRouter(); // Initialize the useRouter hook
 
   const { isLoaded, signIn, setActive } = useSignIn();
+
+  useEffect(() => {
+    if (sessionId) {
+      router.push('/'); // Redirect to the desired route upon successful login
+    }
+  }, [sessionId, router]);
 
   if (!isLoaded) {
     return null;

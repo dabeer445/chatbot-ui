@@ -1,4 +1,4 @@
-import { IconFileExport, IconSettings } from '@tabler/icons-react';
+import { IconFileExport, IconLogout, IconLogout2 } from '@tabler/icons-react';
 import { useContext, useState } from 'react';
 
 import { useTranslation } from 'next-i18next';
@@ -13,6 +13,8 @@ import { SidebarButton } from '../../Sidebar/SidebarButton';
 import ChatbarContext from '../Chatbar.context';
 import { ClearConversations } from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
+import { SignOutButton } from "@clerk/nextjs";
+ 
 
 export const ChatbarSettings = () => {
   const { t } = useTranslation('sidebar');
@@ -49,6 +51,13 @@ export const ChatbarSettings = () => {
         icon={<IconFileExport size={18} />}
         onClick={() => handleExportData()}
       />
+      <SignOutButton>
+        <SidebarButton
+          text={t('Log Out')}
+          icon={<IconLogout2 size={18} />}
+          onClick={() => {}}
+          />
+      </SignOutButton>
 
       {/* <SidebarButton
         text={t('Settings')}
