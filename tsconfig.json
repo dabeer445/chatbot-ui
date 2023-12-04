@@ -35,7 +35,7 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/_app.tsx"
-  ],
+, "pages/api/handler.js"  ],
   "exclude": [
     "node_modules"
   ]
