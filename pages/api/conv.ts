@@ -79,16 +79,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     }
 
     keepRetrievingRun = await openai.beta.threads.runs.retrieve(thread_id, run.id);
+    console.log(keepRetrievingRun)
 
-    while (keepRetrievingRun.status !== 'completed') {
-      // console.log(keepRetrievingRun.status);
-      await new Promise(resolve => setTimeout(resolve, 500));
+    while (keepRetrievingRun.status !== 'completed' && keepRetrievingRun.status !== 'failed') {
+    // while (keepRetrievingRun.status !== 'completed' || keepRetrievingRun.status !== 'failed') {
+      console.log(keepRetrievingRun.status);
+      await new Promise(resolve => setTimeout(resolve, 100));
       keepRetrievingRun = await openai.beta.threads.runs.retrieve(thread_id, run.id);
 
       if (keepRetrievingRun.status == 'requires_action') {
         const tool_calls:any = keepRetrievingRun?.required_action?.submit_tool_outputs.tool_calls[0]
         let { query } = JSON.parse(tool_calls.function.arguments)
+        console.log(query);
         const result = await queryDatabase(query);
+        console.log(result);
         await openai.beta.threads.runs.submitToolOutputs(
           thread_id,
           run.id,
@@ -107,11 +111,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     }
 
+    if(keepRetrievingRun.status == 'failed'){
+      console.log(keepRetrievingRun)
+      throw new Error(JSON.stringify(keepRetrievingRun));
+    }
     const threadMessages = await openai.beta.threads.messages.list(thread_id);
 
     const lastMes: any = threadMessages.data[0];
     const lastMsgContent = lastMes.content[0].text.value;
-    // console.log(lastMsgContent);
+    console.log(lastMsgContent);
 
     res.status(200).json({
       threadId: run.thread_id,

@@ -9,7 +9,8 @@ const uri =
   'mongodb+srv://dabeer445:CEnnrhnm0ysix8P6@consenna.xkh2alz.mongodb.net/?retryWrites=true&w=majority';
 
 const openai = new OpenAI({
-  apiKey: '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', // Replace with your OpenAI API key
+  // apiKey: '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', // Replace with your OpenAI API key
+  apiKey: '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', // Replace with your OpenAI API key
 });
 let threadID = 'thread_do7JgezgQemZTcPE18Y3035o',
   userMessage = 'remove the investment part.',
@@ -297,37 +298,37 @@ async function createAssistant() {
   const myAssistant = await openai.beta.assistants.create({
     instructions: `You are a helpful assistant with access to a database of products. Your main job is to help the human find the product that fits his needs. 
 
-        Whenever you respond with product details, always make sure to include the SKU and the Title of the all the products in response. 
-        
-        Whenever user asks about products by giving specs make sure to give out at least 3-5 products that match the criteria of the human.
-        
-        Never give out any products outside HP Z Portfolio. Always refer to your tool to get info on any product.
-        
-        Use the format below whenever you are giving out product info. Nicely format everything in each line and use markdown for formatting:
-        
-        Title: <product title>
-        SKU: <product BrandPartCode or SKU>
-        Datasheet: <product LeafletPDFURL>`,
+    Whenever you respond with product details, always make sure to include the SKU and the Title of the all the products in response. 
+    
+    Whenever user asks about products by giving specs make sure to give out at least 3-5 products that match the criteria of the human.
+    
+    Never give out any products outside HP Z Portfolio. Always refer to your tool to get info on any product.
+    
+    Use the format below whenever you are giving out product info. Nicely format everything in each line and use markdown for formatting:
+    
+    Title: <product title>
+    SKU: <product BrandPartCode or SKU>
+    Datasheet: <product LeafletPDFURL>`,
     name: 'Consenna Cogent',
     model: 'gpt-4-1106-preview',
     tools: [
       {
         type: 'function',
         function: {
-          name: 'search_products',
-          description:
-            "Used to query the HP Z Portfolio products database. The database has only one table 'products'. The products table has the following coloumns: id, sku, distribution_availability, promotion_type, promotion_url, title, endoflifedate, generatedinttitle, brand, productname, category, productfamily, longdesc, leafletpdfurl, product_type, width, height, depth, weight, on-board_graphics_card_model, processor_manufacturer, processor_family, processor_model. Never use productfamily while searching for products.",
-          parameters: {
-            type: 'object',
-            properties: {
-              query: {
-                type: 'string',
-                description:
-                  'The SQL Query that needs to be executed on the database.',
-              },
+          "name": "search_products",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The SQL Query that needs to be executed on the database."
+              }
             },
-            required: ['query'],
+            "required": [
+              "query"
+            ]
           },
+          "description": "Used to query the HP Z Portfolio products database. The database has only one table 'devices'. The devices table has the following coloumns: id, sku, distribution_availability, promotion_type, promotion_url, title, endoflifedate, generatedinttitle, brand, productname, category, productfamily, longdesc, datasheet, product_type, width, height, depth, weight, on-board_graphics_card_model, processor_manufacturer, processor_family, processor_model. Never use productfamily while searching for products. For processors always format the queries using LIKE, e.g '... processor_family LIKE `%i7%`'"
         },
       },
     ],
@@ -336,9 +337,15 @@ async function createAssistant() {
   console.log(myAssistant);
 }
 
+async function deleteAssistant() {
+  const myAssistant = await openai.beta.assistants.del("asst_Bg1XJfNZxfrTPF5cn6PBxj1f");
+
+  console.log(myAssistant);
+}
 // actions();
-// createAssistant();
+createAssistant();
 // console.log(ma());
 
 // console.log(queryDatabase("ALTER TABLE `devices` CHANGE `on-board_graphics_card_model` `on_board_graphics_card_model` TEXT"))
-console.log(queryDatabase("Select * from devices LIMIT 1;"))
+// console.log(queryDatabase("SELECT sku, title, datasheet FROM devices WHERE processor_manufacturer = 'Intel' AND processor_family like '%i9%' AND category = 'Laptops' LIMIT 5;"))
+// deleteAssistant()
